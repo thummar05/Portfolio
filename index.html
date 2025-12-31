@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raj Thummar | AI Engineer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent: #2997ff; /* iOS Blue */
+            --bg-glass: rgba(0, 0, 0, 0.4);
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Hide horizontal scroll */
+        }
+
+        /* --- 3D Background --- */
+        #warp-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+        }
+
+        /* --- Scroll Snap Container --- */
+        .snap-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* --- Common Section Styles --- */
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* --- Typography --- */
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.25rem;
+            color: #ccc;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* --- Hero Section --- */
+        .hero .tagline {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            font-size: 0.8rem;
+            color: #666;
+            animation: bounce 2s infinite;
+        }
+
+        /* --- Experience Section --- */
+        .exp-box {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            padding: 3rem;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            max-width: 800px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .exp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-glass);
+            padding-bottom: 1.5rem;
+        }
+
+        .exp-role { font-size: 2rem; font-weight: 700; color: #fff; }
+        .exp-company { color: var(--accent); font-size: 1.2rem; margin-top: 0.5rem; display: block; }
+        .exp-date { color: #888; font-size: 0.9rem; text-transform: uppercase; }
+        
+        .exp-list { list-style: none; margin-top: 1.5rem; }
+        .exp-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #ddd;
+        }
+        .exp-list li::before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* --- Project Sections --- */
+        .project-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        /* Active class for animation trigger */
+        section.active .project-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-number {
+            font-size: 10rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.03);
+            position: absolute;
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-pill {
+            padding: 0.5rem 1.2rem;
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #aaa;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .btn-link {
+            margin-top: 2rem;
+            padding: 1rem 3rem;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        
+        .btn-link:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.4); }
+
+        /* Animation Keyframes */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            h2 { font-size: 2rem; }
+            .exp-header { flex-direction: column; gap: 0.5rem; }
+            .project-number { font-size: 5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="warp-canvas"></canvas>
+
+    <div class="snap-container" id="scroller">
+
+        <section class="hero active">
+            <span class="tagline">Portfolio 2025</span>
+            <h1>Raj Thummar</h1>
+            <p>AI Engineer. Builder.</p>
+            <div class="scroll-hint">Scroll to Explore</div>
+        </section>
+
+        <section id="experience-section">
+            <div class="exp-box">
+                <div class="exp-header">
+                    <div>
+                        <div class="exp-role">AI Engineer</div>
+                        <span class="exp-company">Vyapar TaxOne</span> </div>
+                    <span class="exp-date">Oct-2025 — Present</span>
+                </div>
+                <p style="text-align: left; margin-bottom: 1rem; color: #eee;">
+                    Specializing in Large Language Models (LLMs) and Multi-Agent Systems.
+                </p>
+                <ul class="exp-list">
+                    <li>Developed Python backend for AI document Q&A system using Django, Google Gemini API, and RAG architecture (PyPDF2 for PDF parsing).</li>
+                    <li>Implemented YOLOv5 real-time object detection with Flask, OpenCV, and PyTorch. Built NLP recommendation engine using spaCy, TF-IDF, and SQLite.</li>
+                    <li>Tech: Python, YOLOv5, PyTorch.</li>
+                </ul>
+            </div>
+        </section>
+        
+        
+        <section class="hero active">
+            <h1>Projects</h1>
+            <div class="scroll-hint">Scroll to Explore</div>
+        </section>
+        
+        
+
+        <section>
+            <div class="project-number">01</div>
+            <div class="project-content">
+                <div class="tech-stack">
+                    <span class="tech-pill">Python</span>
+                    <span class="tech-pill">Automation</span>
+                    <span class="tech-pill">Fintech</span>
+                </div>
+                <h2>Cloudwalk Bot</h2>
+                <p>
+                    A high-performance automation engine designed for fintech environments. 
+                    It autonomously handles transaction workflows, simulates user interactions, 
+                    and processes data with millisecond precision.
+                </p>
+                <a href="https://github.com/thummar05/cloudwalk-bot" target="_blank" class="btn-link">View Codebase</a>
+            </div>
+        </section>
+
+        <section>
+            <div class="project-number">02</div>
+            <div class="project-content">
+                <div class="tech-stack">
+                    <span class="tech-pill">Swarm Intelligence</span>
+                    <span class="tech-pill">Multi-Agent</span>
+                </div>
+                <h2>Merchant Swarm</h2>
+                <p>
+                    A complex simulation of a merchant social network. 
+                    Uses swarm intelligence to allow independent AI agents to collaborate, 
+                    trade, and optimize social dynamics without human interference.
+                </p>
+                <a href="https://github.com/thummar05/Agent-Swarm-for-a-Merchant-Social-Network" target="_blank" class="btn-link">View Codebase</a>
+            </div>
+        </section>
+
+        <section>
+            <div class="project-number">03</div>
+            <div class="project-content">
+                <div class="tech-stack">
+                    <span class="tech-pill">AI Architecture</span>
+                    <span class="tech-pill">Decentralized AI</span>
+                </div>
+                <h2>Multi-Agent System</h2>
+                <p>
+                    The core framework for autonomous collaboration. 
+                    Enables diverse AI nodes to communicate, share context, and solve 
+                    problems that are too complex for a single model.
+                </p>
+                <a href="https://github.com/thummar05/Multi-Agent-system" target="_blank" class="btn-link">View Codebase</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>Ready to Build?</h2>
+            <p>I am currently available for new opportunities.</p>
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <a href="https://www.linkedin.com/in/raj-thummar-401813231/" target="_blank" class="btn-link" style="background:transparent; border:1px solid #fff; color:#fff">LinkedIn</a>
+                <a href="https://github.com/thummar05" target="_blank" class="btn-link">GitHub</a>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- SCROLL OBSERVER (For fade-in animations) ---
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+
+        // --- 3D WARP SPEED BACKGROUND ---
+        const canvas = document.getElementById('warp-canvas');
+        const scene = new THREE.Scene();
+        // Add subtle blue fog for depth
+        scene.fog = new THREE.FogExp2(0x000000, 0.001);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.z = 1;
+        camera.rotation.x = Math.PI / 2;
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        // --- CREATE STARS ---
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 6000;
+        const positions = new Float32Array(starCount * 3);
+        const velocities = []; // To store individual speeds if needed
+
+        for(let i=0; i<starCount; i++) {
+            positions[i*3] = (Math.random() - 0.5) * 600;     // x
+            positions[i*3+1] = (Math.random() - 0.5) * 600;   // y
+            positions[i*3+2] = (Math.random() - 0.5) * 600;   // z
+            velocities.push(0);
+        }
+
+        starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const starMat = new THREE.PointsMaterial({
+            color: 0xaaaaaa,
+            size: 0.7,
+            transparent: true
+        });
+
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+
+        // --- ANIMATION LOOP ---
+        let speed = 0.5; // Base speed
+        let targetSpeed = 0.5;
+
+        // Listen to scroll to increase warp speed
+        const scroller = document.getElementById('scroller');
+        let isScrolling;
+
+        scroller.addEventListener('scroll', () => {
+            targetSpeed = 4.0; // Boost speed on scroll
+            
+            window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(() => {
+                targetSpeed = 0.5; // Return to normal
+            }, 100);
+        });
+
+        function animate() {
+            // Smoothly interpolate speed
+            speed += (targetSpeed - speed) * 0.1;
+
+            const positions = stars.geometry.attributes.position.array;
+
+            for(let i=0; i<starCount; i++) {
+                // Move stars towards camera (Y axis in this rotation)
+                positions[i*3+1] -= speed;
+
+                // Reset star if it passes behind
+                if (positions[i*3+1] < -200) {
+                    positions[i*3+1] = 200;
+                    // Randomize X and Z again for variety
+                    positions[i*3] = (Math.random() - 0.5) * 600;
+                    positions[i*3+2] = (Math.random() - 0.5) * 600;
+                }
+            }
+            
+            stars.geometry.attributes.position.needsUpdate = true;
+            
+            // Subtle rotation
+            stars.rotation.y += 0.0005;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // --- RESIZE ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
